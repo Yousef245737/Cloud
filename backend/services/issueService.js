@@ -13,4 +13,40 @@ async function readIssues() {
     throw error;
   }
 }
+
+async function writeIssues(issues) {
+    await fs.writeFile(DATA_FILE, JSON.stringify(issues, null, 2));
+}
+
+async function createIssue(input) {
+    const issues = await readIssues();
+    const issue = {
+        id: randomUUID(),
+        title: input.title.trim(),
+        description: input.description.trim(),
+        priority: input.priority,
+        status: 'Open',
+        createdAt: new Date().toISOString()
+    };
+
+    issues.push(issue);
+    await writeIssues(issues);
+    return issue;
+}
+
+async function updateIssueStatus(id, status) {
+    const issues = await readIssues();
+    const issue = issues.find((item) => item.id === id);
+    if (!issue) return null;
+
+    issue.status = status;
+    await writeIssues(issues);
+    return issue;
+}
+
+module.exports = {
+    readIssues,
+    createIssue,
+    updateIssueStatus
+};
 ASY;
